@@ -16,7 +16,7 @@ from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from .mixins import AddDelViewMixin
-from .permissions import AdminOrReadOnly, AuthorStaffOrReadOnly
+from .permissions import AdminOrReadOnly, AuthorAdminOrReadOnly
 from .serializers import (IngredientSerializer, RecipeSerializer,
                           GetRecipeSerializer, TagSerializer,
                           UserSubscribeSerializer)
