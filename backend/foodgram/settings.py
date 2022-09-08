@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 
-from decouple import Csv, config
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -9,17 +8,11 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = config('SECRET_KEY', default='string_from_.env')
+SECRET_KEY = str(os.getenv('SECRET_KEY'))
 
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = False
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*', cast=Csv())
-
-CSRF_TRUSTED_ORIGINS = config(
-    'CSRF_TRUSTED_ORIGINS',
-    default='http://localhost http://127.0.0.1',
-    cast=Csv()
-)
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
