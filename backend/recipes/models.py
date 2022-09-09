@@ -77,7 +77,7 @@ class Recipe(Model):
         verbose_name='Recipe ingredients',
         related_name='recipes',
         to=Ingredient,
-        through='recipes.IngridientAmount',
+        through='recipes.IngredientAmount',
     )
     tags = ManyToManyField(
         verbose_name='Tag',
@@ -139,9 +139,9 @@ class IngredientAmount(Model):
     )
 
     class Meta:
-        verbose_name = 'Ingridient',
-        verbose_name_plural = 'Ingridients',
+        verbose_name = 'Ingredient',
+        verbose_name_plural = 'Ingredients',
         ordering = ('recipe', )
 
     def __str__(self) -> str:
-        return f'{self.amount} {self.ingridients}'
+        return f'{self.amount} {self.ingredients}'
