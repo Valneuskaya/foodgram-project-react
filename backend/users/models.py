@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
-from django.db.models import CharField, EmailField, ManyToManyField
+from django.db import models
+from django.db.models import CharField, EmailField
 from django.db.models.functions import Length
-from django.utils.translation import gettext_lazy as _
 
 CharField.register_lookup(Length)
 
@@ -35,16 +35,10 @@ class User(AbstractUser):
                    'From 1 to 150 letters.'),
     )
     password = CharField(
-        verbose_name=_('Password'),
+        verbose_name='Password',
         max_length=150,
         help_text=('Must-fill form.'
                    'From 1 to 150 letters.'),
-    )
-    subscribe = ManyToManyField(
-        verbose_name='Subscription',
-        related_name='subscribers',
-        to='self',
-        symmetrical=False,
     )
 
     class Meta:
@@ -54,3 +48,26 @@ class User(AbstractUser):
 
     def __str__(self):
         return f'{self.username}: {self.email}'
+
+
+class Subscription(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="Subscribed",
+        related_name="subscribers",
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="Subscribed to",
+        related_name="subscribed_authors",
+    )
+
+    class Meta:
+        ordering = ("-id",)
+        verbose_name = "Subscription"
+        verbose_name_plural = "Subscriptions"
+
+    def __str__(self):
+        return f"{self.user}_to_{self.author}"

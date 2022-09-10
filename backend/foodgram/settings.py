@@ -107,16 +107,17 @@ DJOSER = {
     'LOGIN_FIELD': 'email',
     'HIDE_USERS': False,
     'PERMISSIONS': {
-        'resipe': ('api.permissions.AuthorStaffOrReadOnly,',),
-        'recipe_list': ('api.permissions.AuthorStaffOrReadOnly',),
+        'resipe': ('api.permissions.AuthorAdminOrReadOnly,',),
+        'recipe_list': ('api.permissions.AuthorAdminOrReadOnly',),
         'user': ('api.permissions.OwnerUserOrReadOnly',),
         'user_list': ('api.permissions.OwnerUserOrReadOnly',),
     },
     'SERIALIZERS': {
-        'user': 'api.serializers.UserSerializer',
-        'user_list': 'api.serializers.UserSerializer',
-        'current_user': 'api.serializers.UserSerializer',
-        'user_create': 'api.serializers.UserSerializer',
+        'user': 'users.serializers.UserSerializer',
+        'user_list': 'users.serializers.UserSerializer',
+        'current_user': 'users.serializers.UserSerializer',
+        'user_create': 'users.serializers.UserCreateSerializer',
+        'user_subscribe': 'users.serializers.UserSubscriptionSerializer',
     },
 }
 
