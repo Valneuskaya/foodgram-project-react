@@ -12,7 +12,12 @@ SECRET_KEY = str(os.getenv('SECRET_KEY'))
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '84.201.162.109',
+    'testserver',
+    ]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -21,7 +26,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_filters',
+    'django_filter',
     'django_extensions',
     'djoser',
     'rest_framework',
@@ -109,7 +114,7 @@ DJOSER = {
     'PERMISSIONS': {
         'resipe': ('api.permissions.AuthorAdminOrReadOnly,',),
         'recipe_list': ('api.permissions.AuthorAdminOrReadOnly',),
-        'user': ('api.permissions.OwnerUserOrReadOnly',),
+        "user": ('rest_framework.permissions.IsAuthenticated',),
         'user_list': ('api.permissions.OwnerUserOrReadOnly',),
     },
     'SERIALIZERS': {
