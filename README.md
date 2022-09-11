@@ -55,7 +55,7 @@ scp infra/nginx.conf <username>@<ip host>:/home/<username>/nginx.conf
     TELEGRAM_TO=<ID of chat you wish to send a message to, ask bot @userinfobot for your ID>
     TELEGRAM_TOKEN=<token of your bot, get this token from bot @BotFather>
 ```
-* Workflow consists of the following steps:
+Workflow consists of the following steps:
 - Checking the code for PEP8 compliance and executing the tests implemented in the project;
 - Building and publishing the application image on DockerHub;
 - Automatically downloading the application image and deplaying it to the remote server;
