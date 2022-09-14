@@ -9,14 +9,14 @@ app_name = 'api'
 
 router = DefaultRouter()
 router.register('tags', TagViewSet, 'tags')
-router.register(r'tags/(?P<id>\d+)/', TagViewSet)
+router.register(r'tags/<int:pk>/', TagViewSet)
 router.register('ingredients', IngredientViewSet, 'ingredients')
-router.register(r'ingredients/(?P<id>\d+)/', IngredientViewSet)
+router.register(r'ingredients/<int:pk>/', IngredientViewSet)
 router.register('recipes', RecipeViewSet, 'recipes')
-router.register(r'recipes/(?P<id>\d+)/', RecipeViewSet)
+router.register(r'recipes/<int:pk>/', RecipeViewSet)
 router.register('recipes/download_shopping_cart/', RecipeViewSet)
-router.register(r'recipes/(?P<id>\d+)/shopping_cart/', RecipeViewSet)
-router.register(r'recipes/(?P<id>\d+)/favorite/', RecipeViewSet)
+router.register(r'recipes/<int:pk>/shopping_cart/', RecipeViewSet)
+router.register(r'recipes/<int:pk>/favorite/', RecipeViewSet)
 router.register('users', UserViewSet, 'users')
 
 

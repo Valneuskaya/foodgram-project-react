@@ -1,19 +1,28 @@
 from datetime import datetime as dt
-from urllib.parse import unquote
 
 from django.contrib.auth import get_user_model
 from django.db.models import F, Sum
 from django.http.response import HttpResponse
+from django.shortcuts import get_object_or_404
+from django_filters import rest_framework as filters
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
-from rest_framework.status import HTTP_400_BAD_REQUEST
+from rest_framework.status import (
+    HTTP_201_CREATED,
+    HTTP_204_NO_CONTENT,
+    HTTP_400_BAD_REQUEST,
+)
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
-from recipes.models import Ingredient, IngredientAmount, Recipe, Tag
+from api.filters import IngredientSearchFilter, RecipeFilter
+from recipes.models import (
+    Ingredient, IngredientAmount,
+    Recipe, Tag, Favorite, ShoppingCart
+)
 from users.serializers import GetRecipeSerializer
 
-from .mixins import AddDelViewMixin
 from .permissions import AdminOrReadOnly, AuthorAdminOrReadOnly
 from .serializers import (IngredientSerializer,
                           RecipeSerializer, TagSerializer)
@@ -25,82 +34,79 @@ class TagViewSet(ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = (AdminOrReadOnly,)
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_fields = ('name',)
+    lookup_field = 'id'
+    pagination_class = None
 
 
 class IngredientViewSet(ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = (AdminOrReadOnly,)
-
-    def get_queryset(self):
-        name = self.request.query_params.get('name')
-        queryset = self.queryset
-        if name:
-            if name[0] == '%':
-                name = unquote(name)
-            else:
-                name = name.translate(str.maketrans(
-                    'qwertyuiop[]asdfghjkl;\'zxcvbnm,./',
-                    'йцукенгшщзхъфывапролджэячсмитьбю.'
-                    ))
-            name = name.lower()
-            start_queryset = list(queryset.filter(name__startswith=name))
-            contain_queryset = queryset.filter(name__contains=name)
-            start_queryset.extend(
-                [i for i in contain_queryset if i not in start_queryset]
-            )
-            queryset = start_queryset
-        return queryset
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = IngredientSearchFilter
+    search_fields = ('name',)
+    pagination_class = None
 
 
-class RecipeViewSet(ModelViewSet, AddDelViewMixin):
-    queryset = Recipe.objects.select_related('author')
+class RecipeViewSet(ModelViewSet):
+    queryset = Recipe.objects.all().order_by('id')
     serializer_class = RecipeSerializer
     permission_classes = (AuthorAdminOrReadOnly,)
     pagination_class = PageNumberPagination
     add_serializer = GetRecipeSerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = RecipeFilter
 
-    def get_queryset(self):
-        queryset = self.queryset
+    @staticmethod
+    def post_method(request, pk, serializers):
+        data = {'user': request.user.id, 'recipe': pk}
+        serializer = serializers(data=data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=HTTP_201_CREATED)
 
-        tags = self.request.query_params.getlist('tags')
-        if tags:
-            queryset = queryset.filter(
-                tags__slug__in=tags).distinct()
+    @staticmethod
+    def delete_method(request, pk, model):
+        user = request.user
+        recipe = get_object_or_404(Recipe, id=pk)
+        model_obj = get_object_or_404(model, user=user, recipe=recipe)
+        model_obj.delete()
+        return Response(status=HTTP_204_NO_CONTENT)
 
-        author = self.request.query_params.get('author')
-        if author:
-            queryset = queryset.filter(author=author)
-
-        user = self.request.user
-        if user.is_anonymous:
-            return queryset
-
-        is_in_shopping_cart = self.request.query_params.get(
-            'is_in_shopping_cart'
-            )
-        if is_in_shopping_cart in ('1', 'true',):
-            queryset = queryset.filter(cart=user.id)
-        elif is_in_shopping_cart in ('0', 'false',):
-            queryset = queryset.exclude(cart=user.id)
-
-        is_favorited = self.request.query_params.get('is_favorited')
-        if is_favorited in ('1', 'true',):
-            queryset = queryset.filter(favorite=user.id)
-        if is_favorited in ('0', 'false',):
-            queryset = queryset.exclude(favorite=user.id)
-
-        return queryset
-
-    @action(methods=('get', 'add', 'delete',), detail=True)
+    @action(
+        methods=["POST"],
+        detail=True,
+        permission_classes=[IsAuthenticated]
+    )
     def favorite(self, request, pk):
-        return self.add_del_obj(pk, 'favorite')
+        return self.post_method(
+            request=request, pk=pk, serializers=RecipeSerializer)
 
-    @action(methods=('get', 'add', 'delete',), detail=True)
+    @favorite.mapping.delete
+    def delete_favorite(self, request, pk):
+        return self.delete_method(
+            request=request, pk=pk, model=Favorite)
+
+    @action(
+        methods=["POST"],
+        detail=True,
+        permission_classes=[IsAuthenticated])
     def shopping_cart(self, request, pk):
-        return self.add_del_obj(pk, 'shopping_cart')
+        return self.post_method(
+            request=request, pk=pk, serializers=RecipeSerializer)
 
-    @action(methods=('get',), detail=False)
+    @shopping_cart.mapping.delete
+    def delete_shopping_cart(self, request, pk):
+        return self.delete_method(
+            request=request, pk=pk, model=ShoppingCart)
+
+    @action(
+        methods=['GET'],
+        detail=False,
+        permission_classes=(IsAuthenticated,)
+    )
     def download_shopping_cart(self, request):
         user = self.request.user
         if not user.carts.exists():
@@ -121,9 +127,7 @@ class RecipeViewSet(ModelViewSet, AddDelViewMixin):
             shopping_list += (
                 f'{ing["ingredient"]}: {ing["amount"]} {ing["measure"]}\n'
             )
-
         shopping_list += '\n\nCounted in Foodgram'
-
         response = HttpResponse(
             shopping_list, content_type='text.txt; charset=utf-8'
         )

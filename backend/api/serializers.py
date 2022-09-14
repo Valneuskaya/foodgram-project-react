@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Exists, OuterRef
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework.serializers import (ModelSerializer, SerializerMethodField)
 
@@ -59,23 +60,29 @@ class RecipeSerializer(ModelSerializer):
         )
         return ingredients
 
-    def get_is_favorited(self, obj):
+    def get_is_favorited(self):
         user = self.context.get('request').user
+        favorites = Recipe.objects.filter(
+            user=OuterRef('pk'),
+        )
         if user.is_anonymous:
             return False
-        return user.favorites.filter(id=obj.id).exists()
+        return User.objects.annotate(favorite=Exists(favorites))
 
-    def get_is_in_shopping_cart(self, obj):
+    def get_is_in_shopping_cart(self):
         user = self.context.get('request').user
+        carts = Recipe.objects.filter(
+            user=OuterRef('pk'),
+        )
         if user.is_anonymous:
             return False
-        return user.carts.filter(id=obj.id).exists()
+        return User.objects.annotate(cart=Exists(carts))
 
     def create(self, validated_data):
         image = validated_data.pop('image')
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
-        recipe = Recipe.objects.create(image=image, **validated_data)
+        recipe = super().create(image=image, **validated_data)
         recipe.tags.set(tags)
         for ingredient in ingredients:
             IngredientAmount.objects.get_or_create(
@@ -110,5 +117,5 @@ class RecipeSerializer(ModelSerializer):
                     ingredients=ingredient['ingredient'],
                     amount=ingredient['amount']
                     )
-        recipe.save()
+        super().update()
         return recipe

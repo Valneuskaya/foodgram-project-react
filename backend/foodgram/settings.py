@@ -17,6 +17,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     '84.201.162.109',
     'testserver',
+    '*',
     ]
 
 INSTALLED_APPS = [
@@ -66,17 +67,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': os.getenv(
-            'DB_ENGINE', default='django.db.backends.postgresql'),
-        'NAME': os.getenv('DB_NAME', default=None),
-        'USER': os.getenv('POSTGRES_USER', default=None),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', default=None),
-        'HOST': os.getenv('DB_HOST', default=None),
-        'PORT': os.getenv('DB_PORT', default=None)
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': os.getenv(
+#             'DB_ENGINE', default='django.db.backends.postgresql'),
+#         'NAME': os.getenv('DB_NAME', default=None),
+#         'USER': os.getenv('POSTGRES_USER', default=None),
+#         'PASSWORD': os.getenv('POSTGRES_PASSWORD', default=None),
+#         'HOST': os.getenv('DB_HOST', default=None),
+#         'PORT': os.getenv('DB_PORT', default=None)
+#     }
+# }
 
 AUTH_USER_MODEL = 'users.User'
 

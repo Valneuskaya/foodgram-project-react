@@ -1,22 +1,69 @@
 from djoser.views import UserViewSet as DjoserUserViewSet
-from rest_framework.status import HTTP_401_UNAUTHORIZED
+from rest_framework.status import (
+    HTTP_400_BAD_REQUEST,
+    HTTP_401_UNAUTHORIZED,
+    HTTP_201_CREATED,
+    HTTP_204_NO_CONTENT,
+)
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from api.mixins import AddDelViewMixin
 from .serializers import UserSubscriptionSerializer
+from .models import User, Subscription
 
 
-class UserViewSet(DjoserUserViewSet, AddDelViewMixin):
+class UserViewSet(DjoserUserViewSet):
+    queryset = User.objects.all().order_by("id")
     pagination_class = PageNumberPagination
     serializer_class = UserSubscriptionSerializer
 
-    @action(methods=('get', 'add', 'delete',), detail=True)
-    def subscribe(self, id):
-        return self.add_del_obj(id, 'subscribe')
+    @action(
+        detail=True,
+        methods=["post", "delete"],
+        permission_classes=[IsAuthenticated],
+    )
+    def subscribe(self, request, id=None):
+        if request.method == "POST":
+            user = request.user
+            author = self.get_object()
+            if user == author:
+                data = {"errors": "You can't subscribe to yourself."}
+                return Response(data, status=HTTP_400_BAD_REQUEST)
+            if Subscription.objects.filter(
+                user=user,
+                author=author,
+            ).exists():
+                data = {"errors": "You've already subscribed to the author."}
+                return Response(data, status=HTTP_400_BAD_REQUEST)
+            Subscription.objects.create(
+                user=user,
+                author=author,
+            )
+            serializer = UserSubscriptionSerializer(
+                author,
+                context={"request": request},
+            )
+            return Response(serializer.data, status=HTTP_201_CREATED)
+        if request.method == "DELETE":
+            user = request.user
+            author = self.get_object()
+            subscription = Subscription.objects.filter(
+                user=user,
+                author=author,
+            )
+            if subscription.exists():
+                subscription.delete()
+                return Response(status=HTTP_204_NO_CONTENT)
+            data = {"errors": "You haven't been subscribed to the author."}
+            return Response(data, status=HTTP_400_BAD_REQUEST)
 
-    @action(methods=('get',), detail=False)
+    @action(
+        detail=True,
+        methods=["get"],
+        permission_classes=[IsAuthenticated],
+    )
     def subscription(self, request):
         user = self.request.user
         if user.is_anonymous:

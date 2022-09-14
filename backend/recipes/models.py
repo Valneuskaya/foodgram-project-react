@@ -2,7 +2,8 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import (CASCADE, CharField, DateTimeField, ForeignKey,
                               ImageField, ManyToManyField, Model,
-                              PositiveSmallIntegerField, TextField)
+                              PositiveSmallIntegerField, TextField,
+                              UniqueConstraint)
 
 User = get_user_model()
 
@@ -145,3 +146,65 @@ class IngredientAmount(Model):
 
     def __str__(self) -> str:
         return f'{self.amount} {self.ingredients}'
+
+
+class Favorite(Model):
+    user = ForeignKey(
+        User,
+        on_delete=CASCADE,
+        verbose_name="User",
+    )
+    recipe = ForeignKey(
+        Recipe,
+        on_delete=CASCADE,
+        related_name="favorites",
+        verbose_name="Recipe",
+    )
+
+    class Meta:
+        ordering = ("-id",)
+        verbose_name = "Favorite recipe"
+        verbose_name_plural = "Favorite recipes"
+        constraints = [
+            UniqueConstraint(
+                fields=(
+                    "user",
+                    "recipe",
+                ),
+                name="unique_favorite_user_recipe",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.user} added recipe {self.recipe}"
+
+
+class ShoppingCart(Model):
+    user = ForeignKey(
+        User,
+        on_delete=CASCADE,
+        related_name="shoppingcart",
+        verbose_name="User",
+    )
+    recipe = ForeignKey(
+        Recipe,
+        on_delete=CASCADE,
+        related_name="shoppingcart",
+        verbose_name="User",
+    )
+
+    class Meta:
+        ordering = ("-id",)
+        verbose_name = "Cart"
+        constraints = [
+            UniqueConstraint(
+                fields=(
+                    "user",
+                    "recipe",
+                ),
+                name="unique_shoppingcart_user_recipe",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.user} added recipe {self.recipe}"
