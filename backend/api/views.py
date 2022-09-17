@@ -1,5 +1,6 @@
 from datetime import datetime as dt
 
+from django.db.models import Exists, OuterRef
 from django.contrib.auth import get_user_model
 from django.db.models import F, Sum
 from django.http.response import HttpResponse
@@ -58,6 +59,17 @@ class RecipeViewSet(ModelViewSet):
     add_serializer = GetRecipeSerializer
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = RecipeFilter
+
+    def get_queryset(self):
+        carts = Recipe.objects.filter(
+            user=OuterRef('pk'),
+        )
+        favorites = Recipe.objects.filter(
+            user=OuterRef('pk'),
+        )
+        return self.queryset.annotate(
+            favorite=Exists(favorites)).annotate(
+                cart=Exists(carts))
 
     @staticmethod
     def post_method(request, pk, serializers):

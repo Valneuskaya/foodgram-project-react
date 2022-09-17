@@ -30,7 +30,7 @@ class IngredientSerializer(ModelSerializer):
 class RecipeSerializer(ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
     author = UserSerializer(read_only=True)
-    ingredients = SerializerMethodField()
+    ingredients = IngredientSerializer(many=True, required=False,)
     is_favorited = SerializerMethodField()
     is_in_shopping_cart = SerializerMethodField()
     image = Base64ImageField()
@@ -62,21 +62,15 @@ class RecipeSerializer(ModelSerializer):
 
     def get_is_favorited(self):
         user = self.context.get('request').user
-        favorites = Recipe.objects.filter(
-            user=OuterRef('pk'),
-        )
         if user.is_anonymous:
             return False
-        return User.objects.annotate(favorite=Exists(favorites))
+        return Recipe.objects.filter(favorites__user=user).exists()
 
     def get_is_in_shopping_cart(self):
         user = self.context.get('request').user
-        carts = Recipe.objects.filter(
-            user=OuterRef('pk'),
-        )
         if user.is_anonymous:
             return False
-        return User.objects.annotate(cart=Exists(carts))
+        return Recipe.objects.filter(cart__user=user).exists()
 
     def create(self, validated_data):
         image = validated_data.pop('image')
