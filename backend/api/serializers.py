@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.db.models import Exists, OuterRef
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework.serializers import (ModelSerializer, SerializerMethodField)
 
