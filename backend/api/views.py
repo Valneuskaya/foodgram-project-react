@@ -2,7 +2,7 @@ from datetime import datetime as dt
 
 from django.db.models import Exists, OuterRef
 from django.contrib.auth import get_user_model
-from django.db.models import F, Sum
+from django.db.models import F, Sum, Value
 from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as filters
@@ -61,15 +61,24 @@ class RecipeViewSet(ModelViewSet):
     filterset_class = RecipeFilter
 
     def get_queryset(self):
-        carts = Recipe.objects.filter(
-            user=OuterRef('pk'),
-        )
-        favorites = Recipe.objects.filter(
-            user=OuterRef('pk'),
-        )
-        return self.queryset.annotate(
-            favorite=Exists(favorites)).annotate(
-                cart=Exists(carts))
+        qs = super().get_queryset()
+        if self.request.user.is_anonymous:
+            qs = qs.annotate(
+                is_favorited=Value(False),
+                cart=Value(False)
+            )
+        else:
+            favorite_qs = Favorite.objects.filter(
+                user=self.request.user, recipe=OuterRef('id')
+            )
+            cart_qs = ShoppingCart.objects.filter(
+                user=self.request.user, recipe=OuterRef('id')
+            )
+            qs = qs.annotate(
+                is_favorited=Exists(favorite_qs),
+                is_in_shopping_cart=Exists(cart_qs)
+            )
+        return qs
 
     @staticmethod
     def post_method(request, pk, serializers):
