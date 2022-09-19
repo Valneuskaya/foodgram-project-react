@@ -67,17 +67,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': os.getenv(
-#             'DB_ENGINE', default='django.db.backends.postgresql'),
-#         'NAME': os.getenv('DB_NAME', default=None),
-#         'USER': os.getenv('POSTGRES_USER', default=None),
-#         'PASSWORD': os.getenv('POSTGRES_PASSWORD', default=None),
-#         'HOST': os.getenv('DB_HOST', default=None),
-#         'PORT': os.getenv('DB_PORT', default=None)
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': os.getenv(
+            'DB_ENGINE', default='django.db.backends.postgresql'),
+        'NAME': os.getenv('DB_NAME', default='foodgram'),
+        'USER': os.getenv('POSTGRES_USER', default='foodgram_user'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='foodgram_pswd'),
+        'HOST': os.getenv('DB_HOST', default='db'),
+        'PORT': os.getenv('DB_PORT', default='5432')
+    }
+}
 
 AUTH_USER_MODEL = 'users.User'
 

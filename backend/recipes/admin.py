@@ -32,7 +32,7 @@ class IngredientAdmin(ModelAdmin):
 class IngredientAmountAdmin(ModelAdmin):
     list_display = (
         "pk",
-        "ingredient",
+        "ingredients",
         "amount",
     )
 
