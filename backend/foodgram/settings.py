@@ -17,7 +17,6 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     '84.201.162.109',
     'testserver',
-    '*',
     ]
 
 INSTALLED_APPS = [
@@ -74,7 +73,7 @@ DATABASES = {
         'NAME': os.getenv('DB_NAME', default='foodgram'),
         'USER': os.getenv('POSTGRES_USER', default='foodgram_user'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='foodgram_pswd'),
-        'HOST': os.getenv('DB_HOST', default='db'),
+        'HOST': os.getenv('DB_HOST', default='localhost'),
         'PORT': os.getenv('DB_PORT', default='5432')
     }
 }
