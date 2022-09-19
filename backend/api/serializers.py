@@ -53,12 +53,6 @@ class RecipeSerializer(ModelSerializer):
             'is_in_shopping_cart',
         )
 
-    def get_ingredients(self, obj):
-        ingredients = obj.ingredients.values(
-            'id', 'name', 'measurement_unit', amount='recipe__amount'
-        )
-        return ingredients
-
     def get_is_favorited(self, obj):
         return getattr(obj, 'is_favorited', False)
 
