@@ -22,6 +22,7 @@ class UserViewSet(DjoserUserViewSet):
     @action(
         detail=True,
         methods=["post", "delete"],
+        url_path='subscriptions',
         permission_classes=[IsAuthenticated],
     )
     def subscribe(self, request, id):
