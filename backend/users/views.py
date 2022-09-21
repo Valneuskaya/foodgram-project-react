@@ -24,7 +24,7 @@ class UserViewSet(DjoserUserViewSet):
         methods=["post", "delete"],
         permission_classes=[IsAuthenticated],
     )
-    def subscribe(self, request, id=None):
+    def subscribe(self, request, id):
         if request.method == "POST":
             user = request.user
             author = self.get_object()
@@ -62,6 +62,7 @@ class UserViewSet(DjoserUserViewSet):
     @action(
         detail=True,
         methods=["get"],
+        url_path='subscriptions',
         permission_classes=[IsAuthenticated],
     )
     def subscription(self, request):

@@ -5,7 +5,7 @@ from rest_framework.routers import DefaultRouter
 from .views import UserViewSet
 
 router = DefaultRouter()
-router.register("users", UserViewSet)
+router.register(r'users', UserViewSet)
 router.register(r'users/(?P<id>\d+)/',
                 UserViewSet)
 router.register(r'users/subscriptions/',

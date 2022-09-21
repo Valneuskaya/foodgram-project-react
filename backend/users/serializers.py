@@ -1,4 +1,3 @@
-from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
@@ -7,7 +6,7 @@ from recipes.models import Recipe
 from .models import User
 
 
-class UserSerializer(UserSerializer):
+class UserSerializer(ModelSerializer):
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
@@ -18,8 +17,11 @@ class UserSerializer(UserSerializer):
             "username",
             "first_name",
             "last_name",
-            "is_subscribed",
+            'is_subscribed',
+            'password',
         )
+        extra_kwargs = {'password': {'write_only': True}}
+        read_only_fields = 'is_subscribed',
 
     def get_is_subscribed(self, obj):
         user = self.context["request"].user
@@ -30,23 +32,16 @@ class UserSerializer(UserSerializer):
             ).exists()
         )
 
-
-class UserCreateSerializer(UserCreateSerializer):
-    class Meta:
-        model = User
-        fields = (
-            "email",
-            "id",
-            "username",
-            "first_name",
-            "last_name",
-            "password",
+    def create(self, validated_data):
+        user = User(
+            email=validated_data['email'],
+            username=validated_data['username'],
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
         )
-        extra_kwargs = {
-            "email": {"required": True},
-            "first_name": {"required": True},
-            "last_name": {"required": True},
-        }
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
 
 
 class GetRecipeSerializer(ModelSerializer):
@@ -56,7 +51,7 @@ class GetRecipeSerializer(ModelSerializer):
         read_only_fields = '__all__',
 
 
-class UserSubscriptionSerializer(serializers.ModelSerializer):
+class UserSubscriptionSerializer(ModelSerializer):
     is_subscribed = serializers.SerializerMethodField()
     recipes = GetRecipeSerializer(many=True)
     recipes_count = serializers.SerializerMethodField()
