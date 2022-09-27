@@ -1,8 +1,7 @@
 from django.contrib.auth import get_user_model
 from drf_extra_fields.fields import Base64ImageField
-from rest_framework.serializers import (ModelSerializer, SerializerMethodField)
-
 from recipes.models import Ingredient, IngredientAmount, Recipe, Tag
+from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from users.serializers import UserSerializer
 
 User = get_user_model()
@@ -70,7 +69,7 @@ class RecipeSerializer(ModelSerializer):
                 recipe=recipe,
                 ingredients=ingredient['ingredient'],
                 amount=ingredient['amount']
-                )
+            )
         return recipe
 
     def update(self, recipe, validated_data):
@@ -97,6 +96,6 @@ class RecipeSerializer(ModelSerializer):
                     recipe=recipe,
                     ingredients=ingredient['ingredient'],
                     amount=ingredient['amount']
-                    )
+                )
         super().update()
         return recipe

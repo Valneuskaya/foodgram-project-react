@@ -1,32 +1,25 @@
 from datetime import datetime as dt
 
-from django.db.models import Exists, OuterRef
 from django.contrib.auth import get_user_model
-from django.db.models import F, Sum, Value
+from django.db.models import Exists, F, OuterRef, Sum, Value
 from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as filters
+from recipes.models import (Favorite, Ingredient, IngredientAmount, Recipe,
+                            ShoppingCart, Tag)
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.status import (
-    HTTP_201_CREATED,
-    HTTP_204_NO_CONTENT,
-    HTTP_400_BAD_REQUEST,
-)
+from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
+                                   HTTP_400_BAD_REQUEST)
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-
-from api.filters import IngredientSearchFilter, RecipeFilter
-from recipes.models import (
-    Ingredient, IngredientAmount,
-    Recipe, Tag, Favorite, ShoppingCart
-)
 from users.serializers import GetRecipeSerializer
 
+from api.filters import IngredientSearchFilter, RecipeFilter
+
 from .permissions import AdminOrReadOnly, AuthorAdminOrReadOnly
-from .serializers import (IngredientSerializer,
-                          RecipeSerializer, TagSerializer)
+from .serializers import IngredientSerializer, RecipeSerializer, TagSerializer
 
 User = get_user_model()
 
