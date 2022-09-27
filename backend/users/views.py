@@ -1,4 +1,5 @@
 from djoser.views import UserViewSet as DjoserUserViewSet
+
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
     HTTP_401_UNAUTHORIZED,
@@ -15,28 +16,28 @@ from .models import User, Subscription
 
 
 class UserViewSet(DjoserUserViewSet):
-    queryset = User.objects.all().order_by("id")
+    queryset = User.objects.all().order_by('id')
     pagination_class = PageNumberPagination
     serializer_class = UserSubscriptionSerializer
 
     @action(
         detail=True,
-        methods=["post", "delete"],
+        methods=['post', 'delete'],
         url_path='subscriptions',
         permission_classes=[IsAuthenticated],
     )
     def subscribe(self, request, id):
-        if request.method == "POST":
+        if request.method == 'POST':
             user = request.user
             author = self.get_object()
             if user == author:
-                data = {"errors": "You can't subscribe to yourself."}
+                data = {'errors': 'You cannot subscribe to yourself.'}
                 return Response(data, status=HTTP_400_BAD_REQUEST)
             if Subscription.objects.filter(
                 user=user,
                 author=author,
             ).exists():
-                data = {"errors": "You've already subscribed to the author."}
+                data = {'errors': 'You have already subscribed to the author.'}
                 return Response(data, status=HTTP_400_BAD_REQUEST)
             Subscription.objects.create(
                 user=user,
@@ -44,10 +45,10 @@ class UserViewSet(DjoserUserViewSet):
             )
             serializer = UserSubscriptionSerializer(
                 author,
-                context={"request": request},
+                context={'request': request},
             )
             return Response(serializer.data, status=HTTP_201_CREATED)
-        if request.method == "DELETE":
+        if request.method == 'DELETE':
             user = request.user
             author = self.get_object()
             subscription = Subscription.objects.filter(
@@ -57,12 +58,12 @@ class UserViewSet(DjoserUserViewSet):
             if subscription.exists():
                 subscription.delete()
                 return Response(status=HTTP_204_NO_CONTENT)
-            data = {"errors": "You haven't been subscribed to the author."}
+            data = {'errors': 'You have not been subscribed to the author.'}
             return Response(data, status=HTTP_400_BAD_REQUEST)
 
     @action(
         detail=True,
-        methods=["get"],
+        methods=['get'],
         url_path='subscriptions',
         permission_classes=[IsAuthenticated],
     )

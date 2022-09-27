@@ -152,26 +152,26 @@ class Favorite(Model):
     user = ForeignKey(
         User,
         on_delete=CASCADE,
-        verbose_name="User",
+        verbose_name='User',
     )
     recipe = ForeignKey(
         Recipe,
         on_delete=CASCADE,
-        related_name="favorites",
-        verbose_name="Recipe",
+        related_name='favorites',
+        verbose_name='Recipe',
     )
 
     class Meta:
-        ordering = ("-id",)
-        verbose_name = "Favorite recipe"
-        verbose_name_plural = "Favorite recipes"
+        ordering = ('-id',)
+        verbose_name = 'Favorite recipe'
+        verbose_name_plural = 'Favorite recipes'
         constraints = [
             UniqueConstraint(
                 fields=(
-                    "user",
-                    "recipe",
+                    'user',
+                    'recipe',
                 ),
-                name="unique_favorite_user_recipe",
+                name='unique_favorite_user_recipe',
             )
         ]
 
@@ -183,26 +183,26 @@ class ShoppingCart(Model):
     user = ForeignKey(
         User,
         on_delete=CASCADE,
-        related_name="shoppingcart",
-        verbose_name="User",
+        related_name='shoppingcart',
+        verbose_name='User',
     )
     recipe = ForeignKey(
         Recipe,
         on_delete=CASCADE,
-        related_name="shoppingcart",
-        verbose_name="User",
+        related_name='shoppingcart',
+        verbose_name='User',
     )
 
     class Meta:
-        ordering = ("-id",)
-        verbose_name = "Cart"
+        ordering = ('-id',)
+        verbose_name = 'Cart'
         constraints = [
             UniqueConstraint(
                 fields=(
-                    "user",
-                    "recipe",
+                    'user',
+                    'recipe',
                 ),
-                name="unique_shoppingcart_user_recipe",
+                name='unique_shoppingcart_user_recipe',
             )
         ]
 

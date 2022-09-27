@@ -17,5 +17,5 @@ router.register(r'users/set_password/',
 
 
 urlpatterns = [
-    path("auth/", include("djoser.urls.authtoken")),
+    path('auth/', include('djoser.urls.authtoken')),
 ]

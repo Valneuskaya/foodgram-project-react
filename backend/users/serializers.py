@@ -12,11 +12,11 @@ class UserSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = (
-            "email",
-            "id",
-            "username",
-            "first_name",
-            "last_name",
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
             'is_subscribed',
             'password',
         )
@@ -24,7 +24,7 @@ class UserSerializer(ModelSerializer):
         read_only_fields = 'is_subscribed',
 
     def get_is_subscribed(self, obj):
-        user = self.context["request"].user
+        user = self.context['request'].user
         return (
             user.is_authenticated
             and user.subscribers.filter(
@@ -59,18 +59,18 @@ class UserSubscriptionSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = (
-            "email",
-            "id",
-            "username",
-            "first_name",
-            "last_name",
-            "is_subscribed",
-            "recipes",
-            "recipes_count",
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'is_subscribed',
+            'recipes',
+            'recipes_count',
         )
 
     def get_is_subscribed(self, obj):
-        user = self.context["request"].user
+        user = self.context['request'].user
         return (
             user.is_authenticated
             and user.subscribers.filter(

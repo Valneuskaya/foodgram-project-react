@@ -114,7 +114,7 @@ DJOSER = {
     'PERMISSIONS': {
         'resipe': ('api.permissions.AuthorAdminOrReadOnly,',),
         'recipe_list': ('api.permissions.AuthorAdminOrReadOnly',),
-        "user": ('rest_framework.permissions.IsAuthenticated',),
+        'user': ('rest_framework.permissions.IsAuthenticated',),
         'user_list': ('api.permissions.OwnerUserOrReadOnly',),
     },
     'SERIALIZERS': {

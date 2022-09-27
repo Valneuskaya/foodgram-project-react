@@ -9,10 +9,10 @@ site.site_header = 'Foodgram administration'
 @register(Tag)
 class TagAdmin(ModelAdmin):
     list_display = (
-        "pk",
-        "name",
-        "color",
-        "slug",
+        'pk',
+        'name',
+        'color',
+        'slug',
     )
     empty_value_display = '-empty-'
 
@@ -20,34 +20,34 @@ class TagAdmin(ModelAdmin):
 @register(Ingredient)
 class IngredientAdmin(ModelAdmin):
     list_display = (
-        "pk",
-        "name",
-        "measurement_unit",
+        'pk',
+        'name',
+        'measurement_unit',
     )
-    list_filter = ("name",)
+    list_filter = ('name',)
     empty_value_display = '-empty-'
 
 
 @register(IngredientAmount)
 class IngredientAmountAdmin(ModelAdmin):
     list_display = (
-        "pk",
-        "ingredients",
-        "amount",
+        'pk',
+        'ingredients',
+        'amount',
     )
 
 
 @register(Recipe)
 class RecipeAdmin(ModelAdmin):
     list_display = (
-        "name",
-        "author",
-        "count_favorites",
+        'name',
+        'author',
+        'count_favorites',
     )
     list_filter = (
-        "author",
-        "name",
-        "tags",
+        'author',
+        'name',
+        'tags',
     )
     empty_value_display = '-empty-'
 
@@ -58,16 +58,16 @@ class RecipeAdmin(ModelAdmin):
 @register(Favorite)
 class FavoriteAdmin(ModelAdmin):
     list_display = (
-        "pk",
-        "user",
-        "recipe",
+        'pk',
+        'user',
+        'recipe',
     )
 
 
 @register(ShoppingCart)
 class ShoppingCartAdmin(ModelAdmin):
     list_display = (
-        "pk",
-        "user",
-        "recipe",
+        'pk',
+        'user',
+        'recipe',
     )
