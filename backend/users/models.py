@@ -70,4 +70,4 @@ class Subscription(models.Model):
         verbose_name_plural = 'Subscriptions'
 
     def __str__(self):
-        return f"{self.user}_to_{self.author}"
+        return f'{self.user}_to_{self.author}'
