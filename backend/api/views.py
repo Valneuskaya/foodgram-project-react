@@ -17,6 +17,8 @@ from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from recipes.models import (Favorite, Ingredient, IngredientAmount, Recipe,
                             ShoppingCart, Tag)
 
+from users.serializers import (GetRecipeSerializer)
+
 from .filters import IngredientSearchFilter, RecipeFilter
 from .permissions import AdminOrReadOnly, AuthorAdminOrReadOnly
 from .serializers import (IngredientSerializer, RecipeListSerializer,
@@ -51,6 +53,7 @@ class RecipeViewSet(ModelViewSet):
     pagination_class = PageNumberPagination
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = RecipeFilter
+    add_serializer = GetRecipeSerializer
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -112,8 +115,12 @@ class RecipeViewSet(ModelViewSet):
         detail=True,
         permission_classes=[IsAuthenticated])
     def shopping_cart(self, request, pk):
-        return self.post_method(
-            request=request, pk=pk, serializers=RecipeWriteSerializer)
+        recipe = get_object_or_404(Recipe, id=pk)
+        cart = ShoppingCart.objects.create(
+            user=request.user,
+            recipe=recipe)
+        cart.save()
+        return Response(cart, status=HTTP_201_CREATED)
 
     @shopping_cart.mapping.delete
     def delete_shopping_cart(self, request, pk):

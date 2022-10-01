@@ -190,7 +190,7 @@ class ShoppingCart(Model):
         Recipe,
         on_delete=CASCADE,
         related_name='shoppingcart',
-        verbose_name='User',
+        verbose_name='Recipe',
     )
 
     class Meta:
