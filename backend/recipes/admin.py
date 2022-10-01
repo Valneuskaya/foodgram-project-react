@@ -1,4 +1,5 @@
-from django.contrib.admin import ModelAdmin, register, site
+from django.contrib.admin import (ModelAdmin, TabularInline,
+                                  register, site)
 
 from .models import (Favorite, Ingredient, IngredientAmount,
                      Recipe, ShoppingCart, Tag)
@@ -29,12 +30,13 @@ class IngredientAdmin(ModelAdmin):
 
 
 @register(IngredientAmount)
-class IngredientAmountAdmin(ModelAdmin):
-    list_display = (
-        'pk',
-        'ingredients',
-        'amount',
-    )
+class LinksAdmin(ModelAdmin):
+    pass
+
+
+class IngredientInLine(TabularInline):
+    model = IngredientAmount
+    extra = 10
 
 
 @register(Recipe)
@@ -49,6 +51,7 @@ class RecipeAdmin(ModelAdmin):
         'name',
         'tags',
     )
+    inlines = (IngredientInLine,)
     empty_value_display = '-empty-'
 
     def count_favorites(self, obj):

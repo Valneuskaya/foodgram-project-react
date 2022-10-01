@@ -66,14 +66,6 @@ class Recipe(Model):
         to=User,
         on_delete=CASCADE,
     )
-    picture = ImageField(
-        verbose_name='Recipe picture',
-        upload_to='recipe_pictures',
-    )
-    text = TextField(
-        verbose_name='Recipe description',
-        max_length=5000,
-    )
     ingredients = ManyToManyField(
         verbose_name='Recipe ingredients',
         related_name='recipes',
@@ -85,6 +77,14 @@ class Recipe(Model):
         related_name='recipes',
         to='Tag',
     )
+    image = ImageField(
+        verbose_name='Recipe picture',
+        upload_to='recipe_images/',
+    )
+    text = TextField(
+        verbose_name='Recipe description',
+        max_length=5000,
+    )
     cooking_time = PositiveSmallIntegerField(
         verbose_name='Cooking time',
         default=0,
@@ -93,8 +93,8 @@ class Recipe(Model):
             MaxValueValidator(600),
         ),
     )
-    favourite = ManyToManyField(
-        verbose_name='Favourite recipes',
+    favorite = ManyToManyField(
+        verbose_name='Favorite recipes',
         related_name='favorites',
         to=User,
     )
@@ -120,13 +120,13 @@ class Recipe(Model):
 class IngredientAmount(Model):
     recipe = ForeignKey(
         verbose_name='What recipes',
-        related_name='ingredient',
+        related_name='recipes',
         to=Recipe,
         on_delete=CASCADE,
     )
     ingredients = ForeignKey(
         verbose_name='Linked ingredients',
-        related_name='recipe',
+        related_name='ingredients',
         to=Ingredient,
         on_delete=CASCADE,
     )

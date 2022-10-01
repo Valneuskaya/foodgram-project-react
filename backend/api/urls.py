@@ -15,7 +15,7 @@ router.register(r'recipes', RecipeViewSet, 'recipes')
 router.register(r'recipes/download_shopping_cart', RecipeViewSet)
 router.register(r'recipes/<int:pk>/shopping_cart', RecipeViewSet)
 router.register(r'recipes/<int:pk>/favorite', RecipeViewSet)
-router.register('users', UserViewSet, 'users')
+router.register(r'users', UserViewSet, 'users')
 
 
 urlpatterns = (

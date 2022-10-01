@@ -3,7 +3,7 @@ from rest_framework.permissions import (BasePermission,
 
 
 class AuthorAdminOrReadOnly(IsAuthenticatedOrReadOnly):
-    def has_object_permission(self, request, obj):
+    def has_object_permission(self, request, view, obj):
         return (
             request.method in ('GET',)
             or (request.user == obj.author)

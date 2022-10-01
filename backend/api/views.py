@@ -17,11 +17,10 @@ from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from recipes.models import (Favorite, Ingredient, IngredientAmount, Recipe,
                             ShoppingCart, Tag)
 
-from users.serializers import GetRecipeSerializer
-
 from .filters import IngredientSearchFilter, RecipeFilter
 from .permissions import AdminOrReadOnly, AuthorAdminOrReadOnly
-from .serializers import IngredientSerializer, RecipeSerializer, TagSerializer
+from .serializers import (IngredientSerializer, RecipeListSerializer,
+                          RecipeWriteSerializer, TagSerializer)
 
 User = get_user_model()
 
@@ -48,10 +47,8 @@ class IngredientViewSet(ReadOnlyModelViewSet):
 
 class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all().order_by('id')
-    serializer_class = RecipeSerializer
     permission_classes = (AuthorAdminOrReadOnly,)
     pagination_class = PageNumberPagination
-    add_serializer = GetRecipeSerializer
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = RecipeFilter
 
@@ -60,7 +57,7 @@ class RecipeViewSet(ModelViewSet):
         if self.request.user.is_anonymous:
             qs = qs.annotate(
                 is_favorited=Value(False),
-                cart=Value(False)
+                is_in_shopping_cart=Value(False)
             )
         else:
             favorite_qs = Favorite.objects.filter(
@@ -74,6 +71,11 @@ class RecipeViewSet(ModelViewSet):
                 is_in_shopping_cart=Exists(cart_qs)
             )
         return qs
+
+    def get_serializer_class(self):
+        if self.request.method in ('get'):
+            return RecipeListSerializer
+        return RecipeWriteSerializer
 
     @staticmethod
     def post_method(request, pk, serializers):
@@ -98,7 +100,7 @@ class RecipeViewSet(ModelViewSet):
     )
     def favorite(self, request, pk):
         return self.post_method(
-            request=request, pk=pk, serializers=RecipeSerializer)
+            request=request, pk=pk, serializers=RecipeWriteSerializer)
 
     @favorite.mapping.delete
     def delete_favorite(self, request, pk):
@@ -111,7 +113,7 @@ class RecipeViewSet(ModelViewSet):
         permission_classes=[IsAuthenticated])
     def shopping_cart(self, request, pk):
         return self.post_method(
-            request=request, pk=pk, serializers=RecipeSerializer)
+            request=request, pk=pk, serializers=RecipeWriteSerializer)
 
     @shopping_cart.mapping.delete
     def delete_shopping_cart(self, request, pk):

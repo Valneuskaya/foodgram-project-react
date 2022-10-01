@@ -10,7 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = str(os.getenv('SECRET_KEY'))
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
     'localhost',
@@ -74,7 +74,7 @@ DATABASES = {
         'NAME': os.getenv('DB_NAME', default='foodgram'),
         'USER': os.getenv('POSTGRES_USER', default='foodgram_user'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='foodgram_pswd'),
-        'HOST': os.getenv('DB_HOST', default='db'),
+        'HOST': os.getenv('DB_HOST', default='localhost'),
         'PORT': os.getenv('DB_PORT', default='5432')
     }
 }
@@ -118,11 +118,10 @@ DJOSER = {
         'user_list': ('api.permissions.OwnerUserOrReadOnly',),
     },
     'SERIALIZERS': {
-        'user': 'users.serializers.UserSerializer',
-        'user_list': 'users.serializers.UserSerializer',
-        'current_user': 'users.serializers.UserSerializer',
-        'user_create': 'users.serializers.UserCreateSerializer',
-        'user_subscribe': 'users.serializers.UserSubscriptionSerializer',
+        'user': 'api.serializers.UserSerializer',
+        'user_list': 'api.serializers.UserSerializer',
+        'current_user': 'api.serializers.UserSerializer',
+        'user_create': 'api.serializers.UserSerializer',
     },
 }
 
