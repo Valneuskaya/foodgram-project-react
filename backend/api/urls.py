@@ -12,9 +12,9 @@ router = DefaultRouter()
 router.register(r'tags', TagViewSet, 'tags')
 router.register(r'ingredients', IngredientViewSet, 'ingredients')
 router.register(r'recipes', RecipeViewSet, 'recipes')
-router.register(r'recipes/download_shopping_cart', RecipeViewSet)
-router.register(r'recipes/<int:pk>/shopping_cart', RecipeViewSet)
-router.register(r'recipes/<int:pk>/favorite', RecipeViewSet)
+# router.register(r'recipes/download_shopping_cart', RecipeViewSet)
+# router.register(r'recipes/<int:pk>/shopping_cart', RecipeViewSet)
+# router.register(r'recipes/<int:pk>/favorite', RecipeViewSet)
 router.register(r'users', UserViewSet, 'users')
 
 

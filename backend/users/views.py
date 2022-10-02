@@ -12,13 +12,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from .models import Subscription, User
-from .serializers import UserSubscriptionSerializer
+from .serializers import UserSerializer, UserSubscriptionSerializer
 
 
 class UserViewSet(DjoserUserViewSet):
     queryset = User.objects.all().order_by('id')
     pagination_class = PageNumberPagination
-    serializer_class = UserSubscriptionSerializer
+    serializer_class = UserSerializer
 
     @action(
         detail=True,
