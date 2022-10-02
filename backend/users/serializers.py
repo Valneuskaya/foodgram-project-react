@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
 from recipes.models import Recipe
 
@@ -45,11 +45,20 @@ class UserSerializer(ModelSerializer):
 
 
 class GetRecipeSerializer(ModelSerializer):
+    is_favorited = SerializerMethodField()
+    is_in_shopping_cart = SerializerMethodField()
+
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'tags', 'cooking_time',
                   'is_favorited', 'is_in_shopping_cart')
         read_only_fields = '__all__',
+
+    def get_is_favorited(self, obj):
+        return getattr(obj, 'is_favorited', False)
+
+    def get_is_in_shopping_cart(self, obj):
+        return getattr(obj, 'is_in_shopping_cart', False)
 
 
 class UserSubscriptionSerializer(ModelSerializer):

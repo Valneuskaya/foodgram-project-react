@@ -9,11 +9,11 @@ This service allows users to post recipes, subscribe to other users' publication
 - git (version control).
 
 ## The project in the internet:
-- The project is up and available at [*]
+- The project is up and available at [http://84.201.162.109/]
 
-- Admin available at [*]
+- Admin available at [http://84.201.162.109/admin]
 
-- Documentation for writing api project available at [*]
+- Documentation for writing api project available at [hhttp://84.201.162.109/api/docs/redoc.html]
 
 ## Project start
 * Clone the repo for your local computer.

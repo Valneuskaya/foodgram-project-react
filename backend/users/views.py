@@ -1,5 +1,7 @@
 from djoser.views import UserViewSet as DjoserUserViewSet
 
+from django.db.models import OuterRef
+
 from rest_framework.status import (
     HTTP_201_CREATED,
     HTTP_204_NO_CONTENT,
@@ -22,11 +24,11 @@ class UserViewSet(DjoserUserViewSet):
 
     @action(
         detail=True,
-        methods=['post', 'delete'],
-        url_path='subscriptions',
+        methods=['POST', 'DELETE'],
+        url_path='subscribe',
         permission_classes=[IsAuthenticated],
     )
-    def subscribe(self, request):
+    def subscribe(self, request, id):
         if request.method == 'POST':
             user = request.user
             author = self.get_object()
@@ -62,17 +64,22 @@ class UserViewSet(DjoserUserViewSet):
             return Response(data, status=HTTP_400_BAD_REQUEST)
 
     @action(
-        detail=True,
-        methods=['get'],
+        detail=False,
+        methods=['GET'],
         url_path='subscriptions',
         permission_classes=[IsAuthenticated],
     )
-    def subscription(self, request):
+    def subscriptions(self, request):
         user = self.request.user
         if user.is_anonymous:
             return Response(status=HTTP_401_UNAUTHORIZED)
-        all_authors = user.subscribe.all()
-        pages = self.paginate_queryset(all_authors)
+        subscribed_to_authors = Subscription.objects.filter(
+            user=user, author=OuterRef('id')
+        )
+        subscriptions = User.objects.all().filter(
+            id__in=(subscribed_to_authors.values('author_id'))
+        )
+        pages = self.paginate_queryset(subscriptions)
         serializer = UserSubscriptionSerializer(
             pages, many=True, context={'request': request}
         )
