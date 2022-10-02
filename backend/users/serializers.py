@@ -47,7 +47,8 @@ class UserSerializer(ModelSerializer):
 class GetRecipeSerializer(ModelSerializer):
     class Meta:
         model = Recipe
-        fields = ('id', 'name', 'image', 'cooking_time')
+        fields = ('id', 'name', 'image', 'tags', 'cooking_time',
+                  'is_favorited', 'is_in_shopping_cart')
         read_only_fields = '__all__',
 
 

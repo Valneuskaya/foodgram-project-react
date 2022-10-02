@@ -9,7 +9,7 @@ def create_ingredients(ingredients, recipe):
     for ingredient in ingredients:
         IngredientAmount.objects.get_or_create(
             recipe=recipe,
-            ingredients_id=ingredient['ingredient'],
+            ingredients_id=ingredient['id'],
             amount=ingredient['amount']
         )
 

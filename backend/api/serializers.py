@@ -27,6 +27,7 @@ class TagSerializer(ModelSerializer):
 
 
 class IngredientSerializer(ModelSerializer):
+    # TODO: add amount
     class Meta:
         model = Ingredient
         fields = '__all__'
@@ -125,7 +126,7 @@ class RecipeWriteSerializer(ModelSerializer):
             value_validate(amount)
 
             valid_ingredients.append(
-                {'ingredient': ingredient, 'amount': amount}
+                {'id': ingredient, 'amount': amount}
             )
 
         data['name'] = name.capitalize()
@@ -143,29 +144,9 @@ class RecipeWriteSerializer(ModelSerializer):
         return recipe
 
     def update(self, recipe, validated_data):
-        tags = validated_data.get('tags')
-        ingredients = validated_data.get('ingredients')
-
-        recipe.image = validated_data.get(
-            'image', recipe.image)
-        recipe.name = validated_data.get(
-            'name', recipe.name)
-        recipe.text = validated_data.get(
-            'text', recipe.text)
-        recipe.cooking_time = validated_data.get(
-            'cooking_time', recipe.cooking_time)
-
-        if tags:
-            recipe.tags.clear()
-            recipe.tags.set(tags)
-
+        ingredients = validated_data.pop('ingredients')
+        super().update(recipe, validated_data)
         if ingredients:
             recipe.ingredients.clear()
-            for ingredient in ingredients:
-                IngredientAmount.objects.get_or_create(
-                    recipe=recipe,
-                    ingredients=ingredient['ingredient'],
-                    amount=ingredient['amount']
-                )
-        super().update()
+            create_ingredients(ingredients, recipe)
         return recipe

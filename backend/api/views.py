@@ -10,14 +10,11 @@ from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
-                                   HTTP_400_BAD_REQUEST)
+from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT)
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from recipes.models import (Favorite, Ingredient, IngredientAmount, Recipe,
                             ShoppingCart, Tag)
-
-from users.serializers import (GetRecipeSerializer)
 
 from .filters import IngredientSearchFilter, RecipeFilter
 from .permissions import AdminOrReadOnly, AuthorAdminOrReadOnly
@@ -53,11 +50,18 @@ class RecipeViewSet(ModelViewSet):
     pagination_class = PageNumberPagination
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = RecipeFilter
-    add_serializer = GetRecipeSerializer
 
     def get_queryset(self):
-        qs = super().get_queryset()
+        self.paginator.page = self.request.query_params.get("page", 1)
+        self.paginator.page_size = self.request.query_params.get("limit", 6)
+
+        is_favorited = True if self.request.query_params.get(
+            "is_favorited", '0') == '1' else False
+        is_in_shopping_cart = True if self.request.query_params.get(
+            "is_in_shopping_cart", '0') == '1' else False
+
         if self.request.user.is_anonymous:
+            qs = Recipe.objects.all().order_by('id')
             qs = qs.annotate(
                 is_favorited=Value(False),
                 is_in_shopping_cart=Value(False)
@@ -69,14 +73,22 @@ class RecipeViewSet(ModelViewSet):
             cart_qs = ShoppingCart.objects.filter(
                 user=self.request.user, recipe=OuterRef('id')
             )
-            qs = qs.annotate(
+            qs = Recipe.objects.all().order_by('id').annotate(
                 is_favorited=Exists(favorite_qs),
                 is_in_shopping_cart=Exists(cart_qs)
             )
+            if is_favorited:
+                qs = qs.filter(
+                    id__in=(favorite_qs.values('recipe_id'))
+                )
+            if is_in_shopping_cart:
+                qs = qs.filter(
+                    id__in=(cart_qs.values('recipe_id'))
+                )
         return qs
 
     def get_serializer_class(self):
-        if self.request.method in ('get'):
+        if self.request.method in ('GET'):
             return RecipeListSerializer
         return RecipeWriteSerializer
 
@@ -98,20 +110,33 @@ class RecipeViewSet(ModelViewSet):
 
     @action(
         methods=['POST'],
+        url_path='favorite',
         detail=True,
         permission_classes=[IsAuthenticated]
     )
     def favorite(self, request, pk):
-        return self.post_method(
-            request=request, pk=pk, serializers=RecipeWriteSerializer)
+        recipe = get_object_or_404(Recipe, id=pk)
+        favotite = Favorite.objects.create(
+            user=request.user,
+            recipe=recipe)
+        favotite.save()
+        data = {
+            "id": favotite.recipe.pk,
+            "name": favotite.recipe.name,
+            "image": favotite.recipe.image.url,
+            "cooking_time": favotite.recipe.cooking_time
+        }
+        return Response(data, status=HTTP_201_CREATED)
 
     @favorite.mapping.delete
     def delete_favorite(self, request, pk):
-        return self.delete_method(
+        self.delete_method(
             request=request, pk=pk, model=Favorite)
+        return Response(status=HTTP_204_NO_CONTENT)
 
     @action(
         methods=['POST'],
+        url_path='shopping_cart',
         detail=True,
         permission_classes=[IsAuthenticated])
     def shopping_cart(self, request, pk):
@@ -120,30 +145,45 @@ class RecipeViewSet(ModelViewSet):
             user=request.user,
             recipe=recipe)
         cart.save()
-        return Response(cart, status=HTTP_201_CREATED)
+        data = {
+            "id": cart.recipe.pk,
+            "name": cart.recipe.name,
+            "image": cart.recipe.image.url,
+            "cooking_time": cart.recipe.cooking_time
+        }
+        return Response(data, status=HTTP_201_CREATED)
 
     @shopping_cart.mapping.delete
     def delete_shopping_cart(self, request, pk):
-        return self.delete_method(
+        self.delete_method(
             request=request, pk=pk, model=ShoppingCart)
+        return Response(status=HTTP_204_NO_CONTENT)
 
     @action(
         methods=['GET'],
+        url_path='download_shopping_cart',
         detail=False,
         permission_classes=(IsAuthenticated,)
     )
     def download_shopping_cart(self, request):
         user = self.request.user
-        if not user.carts.exists():
-            return Response(status=HTTP_400_BAD_REQUEST)
+        if user.is_anonymous:
+            return Response(status=403)
+
+        cart_qs = ShoppingCart.objects.filter(
+            user=self.request.user, recipe=OuterRef('id')
+        )
+        qs = Recipe.objects.all().filter(
+            id__in=(cart_qs.values('recipe_id'))
+        )
         ingredients = IngredientAmount.objects.filter(
-            recipe__in=(user.carts.values('id'))
+            recipe__in=(qs.values('id'))
         ).values(
             ingredient=F('ingredients__name'),
             measure=F('ingredients__measurement_unit')
         ).annotate(amount=Sum('amount'))
 
-        filename = f'{user.username}_shopping_list.txt'
+        filename = f'{user.first_name}_shopping_list.txt'
         shopping_list = (
             f'Shopping_list for:\n\n{user.first_name}\n\n'
             f'{dt.now().strftime("%d/%m/%Y %H:%M")}\n\n'
