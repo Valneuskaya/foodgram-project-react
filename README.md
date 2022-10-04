@@ -13,7 +13,7 @@ This service allows users to post recipes, subscribe to other users' publication
 
 - Admin available at [http://84.201.162.109/admin]
 
-- Documentation for writing api project available at [hhttp://84.201.162.109/api/docs/redoc.html]
+- Documentation for writing api project available at [http://84.201.162.109/api/docs/redoc.html]
 
 ## Project start
 * Clone the repo for your local computer.
@@ -29,7 +29,6 @@ sudo apt install docker.io
 scp infra/docker-compose.yml <username>@<ip host>:/home/<username>/docker-compose.yml
 scp infra/nginx.conf <username>@<ip host>:/home/<username>/nginx.conf
 ```
-* Copy the docs folder to the server:
 
 ## Workflow
 
@@ -63,4 +62,6 @@ Workflow consists of the following steps:
 
 
 ## Author
-Valeri Neuskaya
+Backend by Valeri Neuskaya
+
+Frontend by Yandex.Practicum
