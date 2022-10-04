@@ -6,8 +6,9 @@ from rest_framework.serializers import (ModelSerializer,
                                         PrimaryKeyRelatedField,
                                         SerializerMethodField,
                                         ValidationError)
+from rest_framework.permissions import AllowAny
 
-from recipes.models import Ingredient, IngredientAmount, Recipe, Tag
+from recipes.models import Ingredient, Recipe, Tag
 from users.serializers import UserSerializer
 from .services import create_ingredients, is_hex_color, value_validate
 
@@ -15,6 +16,8 @@ User = get_user_model()
 
 
 class TagSerializer(ModelSerializer):
+    permission_classes = (AllowAny, )
+
     class Meta:
         model = Tag
         fields = '__all__'
@@ -27,7 +30,6 @@ class TagSerializer(ModelSerializer):
 
 
 class IngredientSerializer(ModelSerializer):
-    # TODO: add amount
     class Meta:
         model = Ingredient
         fields = '__all__'
@@ -37,7 +39,7 @@ class IngredientSerializer(ModelSerializer):
 class RecipeListSerializer(ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
     author = UserSerializer(read_only=True)
-    ingredients = IngredientSerializer(many=True, read_only=True)
+    ingredients = SerializerMethodField()
     is_favorited = SerializerMethodField()
     is_in_shopping_cart = SerializerMethodField()
     image = Base64ImageField()
@@ -55,12 +57,17 @@ class RecipeListSerializer(ModelSerializer):
             'cooking_time',
             'is_favorited',
             'is_in_shopping_cart',
-            # 'pub_date'
         )
         read_only_fields = (
             'is_favorited',
             'is_in_shopping_cart'
         )
+
+    def get_ingredients(self, obj):
+        ingredients = obj.ingredients.values(
+            'id', 'name', 'measurement_unit', amount=F('ingredients__amount')
+        )
+        return ingredients
 
     def get_is_favorited(self, obj):
         return getattr(obj, 'is_favorited', False)
@@ -144,9 +151,14 @@ class RecipeWriteSerializer(ModelSerializer):
         return recipe
 
     def update(self, recipe, validated_data):
+        tags = validated_data.get('tags')
         ingredients = validated_data.pop('ingredients')
         super().update(recipe, validated_data)
         if ingredients:
             recipe.ingredients.clear()
             create_ingredients(ingredients, recipe)
+
+        if tags:
+            recipe.tags.clear()
+            recipe.tags.set(tags)
         return recipe

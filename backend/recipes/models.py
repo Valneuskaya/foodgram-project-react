@@ -16,7 +16,7 @@ class Tag(Model):
     )
     color = CharField(
         verbose_name='HEX code',
-        max_length=6,
+        max_length=8,
         blank=True,
         null=True,
         default='FF',

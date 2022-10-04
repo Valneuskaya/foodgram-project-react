@@ -28,9 +28,6 @@ class TagViewSet(ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = (AdminOrReadOnly,)
-    filter_backends = (filters.DjangoFilterBackend,)
-    filterset_fields = ('name',)
-    lookup_field = 'id'
     pagination_class = None
 
 
@@ -40,7 +37,7 @@ class IngredientViewSet(ReadOnlyModelViewSet):
     permission_classes = (AdminOrReadOnly,)
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = IngredientSearchFilter
-    search_fields = ('name',)
+    search_fields = ('^name',)
     pagination_class = None
 
 
