@@ -1,6 +1,5 @@
 # The Foodgram website
-![greetings!](https://github.com/Valneuskaya/
-foodgram-project-react/actions/workflows/main.yml/badge.svg)
+![greetings!](https://github.com/Valneuskaya/foodgram-project-react/actions/workflows/main.yml/badge.svg)
 
 This service allows users to post recipes, subscribe to other users' publications, add their favourite recipes to their Favourites list, and download a list of the products needed to prepare the selected dishes.
 
