@@ -59,6 +59,6 @@ Workflow consists of the following steps:
 
 
 ## Author
-Backend by Valeri Neuskaya
+Backend by Valeri Neuskaya [https://github.com/Valneuskaya]
 
-Frontend by Yandex.Practicum
+Frontend by yandex-praktikum [https://github.com/yandex-praktikum]
