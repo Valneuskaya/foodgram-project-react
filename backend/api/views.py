@@ -49,13 +49,13 @@ class RecipeViewSet(ModelViewSet):
     filterset_class = RecipeFilter
 
     def get_queryset(self):
-        self.paginator.page = self.request.query_params.get("page", 1)
-        self.paginator.page_size = self.request.query_params.get("limit", 6)
+        self.paginator.page = self.request.query_params.get('page', 1)
+        self.paginator.page_size = self.request.query_params.get('limit', 6)
 
         is_favorited = True if self.request.query_params.get(
-            "is_favorited", '0') == '1' else False
+            'is_favorited', '0') == '1' else False
         is_in_shopping_cart = True if self.request.query_params.get(
-            "is_in_shopping_cart", '0') == '1' else False
+            'is_in_shopping_cart', '0') == '1' else False
 
         if self.request.user.is_anonymous:
             qs = Recipe.objects.all().order_by('id')
@@ -118,10 +118,10 @@ class RecipeViewSet(ModelViewSet):
             recipe=recipe)
         favotite.save()
         data = {
-            "id": favotite.recipe.pk,
-            "name": favotite.recipe.name,
-            "image": favotite.recipe.image.url,
-            "cooking_time": favotite.recipe.cooking_time
+            'id': favotite.recipe.pk,
+            'name': favotite.recipe.name,
+            'image': favotite.recipe.image.url,
+            'cooking_time': favotite.recipe.cooking_time
         }
         return Response(data, status=HTTP_201_CREATED)
 
@@ -143,10 +143,10 @@ class RecipeViewSet(ModelViewSet):
             recipe=recipe)
         cart.save()
         data = {
-            "id": cart.recipe.pk,
-            "name": cart.recipe.name,
-            "image": cart.recipe.image.url,
-            "cooking_time": cart.recipe.cooking_time
+            'id': cart.recipe.pk,
+            'name': cart.recipe.name,
+            'image': cart.recipe.image.url,
+            'cooking_time': cart.recipe.cooking_time
         }
         return Response(data, status=HTTP_201_CREATED)
 
