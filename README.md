@@ -1,38 +1,31 @@
 # The Foodgram website
 This service allows users to post recipes, subscribe to other users' publications, add their favourite recipes to their Favourites list, and download a list of the products needed to prepare the selected dishes.
 
-# Screenshots of the project
-
-
-
 ## Steck tech
 - Python (using Django REST Framework);
 - library Djoser (authentication by tockens);
 - library django-filter (request filters);
 - PostgreSQL database;
+- Docker
 - git (version control).
 
-## The project in the internet:
-- The project is up and available at [http://84.201.162.109/]
+# Screenshots of the project
+<img src="https://github.com/Valneuskaya/foodgram-project-react/blob/master/images/main.png" width="600">
+<img src="https://github.com/Valneuskaya/foodgram-project-react/blob/master/images/recipe%20create.png" width="600">
+<img src="https://github.com/Valneuskaya/foodgram-project-react/blob/master/images/signup.png" width="600">
+<img src="https://github.com/Valneuskaya/foodgram-project-react/blob/master/images/subscriptions.png" width="600">
 
-- Admin available at [http://84.201.162.109/admin]
-
+## The project in the internet (disabled)
+- The project is available at [http://84.201.162.109/]
 - Documentation for writing api project available at [http://84.201.162.109/api/docs/redoc.html]
 
 ## Project start
-* Clone the repo for your local computer.
-
-### To work with remote server (Ubuntu):
-* Log onto your remote server.
-* Install docker on the server.
-sudo apt install docker.io 
-* Install docker-compose on the server.
-* Locally edit the file infra/nginx/default.conf.conf, write your IP in the server_name line.
-* Copy the docker-compose.yml and nginx.conf files from the infra folder to the server.
-```
-scp infra/docker-compose.yml <username>@<ip host>:/home/<username>/docker-compose.yml
-scp infra/nginx.conf <username>@<ip host>:/home/<username>/nginx.conf
-```
+* Clone the repo
+* Build infra Docker containers (backend, frontend, db, nginx)
+* Run Docker containers
+* Create database
+* Re-run containers
+* Open App URL
 
 ## Workflow
 
